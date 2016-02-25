@@ -1,0 +1,55 @@
+{
+    "name": "Event",
+    "base": "PersistedModel",
+    "idInjection": true,
+    "options": {
+        "mysql": {
+            "table": "events"
+        },
+        "validateUpsert": true
+    },
+    "properties": {
+        "eventName": {
+            "type": "string",
+            "required": true
+        },
+        "eventTime": {
+            "type": "string",
+            "required": true
+        },
+        "appName": {
+            "type": "string",
+            "required": true
+        },
+        "timeZone": {
+            "type": "number",
+            "required": true
+        },
+        "assetSerial": {
+            "type": "string"
+        },
+        "userId": {
+            "type": "string"
+        },
+        "geoLocation": {
+            "type": "object"
+        },
+        "location": {
+            "type": "geopoint"
+        },
+        "client": {
+            "type": "object"
+        },
+         "eventOrigin": {
+            "type": "string"
+        },
+        "meta": {
+            "type": "object"
+        }
+       
+    },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

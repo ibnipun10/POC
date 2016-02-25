@@ -1,0 +1,5 @@
+E:\Analytics\events-api\bin\Microsoft.NodejsTools.WebRole.dll
+E:\Analytics\Analytics\events-api\bin\Microsoft.NodejsTools.WebRole.dll
+E:\Analytics\Analytics\events-api\obj\Debug\eventsApi.njsprojResolveAssemblyReference.cache
+E:\AnalyticsKinesis\cs-sams-analytics\events-api\v2\obj\Debug\eventsApi.njsprojResolveAssemblyReference.cache
+E:\AnalyticsKinesis\cs-sams-analytics\events-api\v2\bin\Microsoft.NodejsTools.WebRole.dll

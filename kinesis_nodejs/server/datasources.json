@@ -1,0 +1,14 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "events": {
+    "host": "localhost",
+    "database": "events_api",
+    "password": "",
+    "name": "events",
+    "connector": "mysql",
+    "user": "root"
+  }
+}
