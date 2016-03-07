@@ -1,4 +1,4 @@
-from pyspark.streaming.kinesis import KinesisUtils, InitialPositionInStream
+from pyspark.streaming.kinesis import KinesisUtils
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.sql import SQLContext
@@ -13,76 +13,60 @@ from datetime import datetime
 import calendar
 from pyspark.sql.functions import lit
 import re
+import os
+from time import gmtime, strftime
+from user_agents import parse
+from constants import *
 
-columns = ['LogFilename','RowNumber','timestamp','time-taken','c-ip','filesize','s-ip','s-port','sc-status','sc-bytes','cs-method','cs-uri-stem','-','rs-duration','rs-bytes','c-referrer','c-user-agent','customer-id','x-ec_custom-1']
+SPARK_APPNAME = 'Kinesis'
+SPARK_STREAM_BATCH = 10
 
-COL_STARTTIME = 'startTime'
-COL_ENDTIME = 'endTime'
-COL_CUSTOMERID = 'CustomerId'
-COL_PROJECTID = 'projectId'
-COL_FONTTYPE = 'fontType'
-COL_FONTID = 'fontId'
-COL_DOMAINNAME = 'domainName'
-COL_USERAGENT = 'userAgent'
-COL_IPADDRESS = 'ipAddress'
-COL_GEOLOCATION = 'geoLocation'
-COL_PAGEVIEWCOUNT = 'pageViewCount'
+def writeToTable(table, groupDf):
 
-PROJECTID = 'projectId'
-
-#redshift cred
-REDSHIFT_HOSTNAME = 'venkat-test.cfxcbauz3avq.us-east-1.redshift.amazonaws.com'
-REDSHIFT_PORT = '5439'
-REDSHIFT_USERNAME = 'venkattest'
-REDSHIFT_PASSWORD = 'BPOahslA9ytWRivguhkV'
-REDSHIFT_DATABASE = 'venkattest'
-REDSHIFT_PAGEVIEW_TBL = 'PageView'
-
-#kinesis cred
-APPLICATION_NAME = 'samsanalyticsprocessor'
-STREAM_NAME = 'SAMSAnalytics'
-REGION_NAME = 'us-east-1'
-INITIAL_POS = InitialPositionInStream.LATEST
-CHECKPOINT_INTERVAL = 2
-ENDPOINT = 'https://kinesis.us-east-1.amazonaws.com'
-AWSACCESSID = 'AKIAJSK34E5YQK36DMRQ'
-AWSSECRETKEY = '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'
-
-#S3 cred
-S3ACCESSID = 'AKIAJSK34E5YQK36DMRQ'
-S3SECRETKEY = '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'
-BUCKET = 'sams-analytics-poc'
-FOLDER = 'sams-poc'
+	print 'writeToTable'
 	
-def WriteToTable(df, type):
-	if type in REDSHIFT_PAGEVIEW_TBL:
-		df = df.groupby([COL_STARTTIME, COL_ENDTIME, COL_CUSTOMERID, COL_PROJECTID, COL_FONTTYPE, COL_DOMAINNAME, COL_USERAGENT]).count()
-		df = df.withColumnRenamed('count', COL_PAGEVIEWCOUNT)
+	groupDf = groupDf.withColumnRenamed('count', COL_PAGEVIEWCOUNT)
+	
+	groupDf = groupDf.coalesce(NUM_PARTITIONS)
+	count = groupDf.count()	
+	
+	printOnConsole(' count of groupdf ' + table + ' is : ' + str(count))
+	
+	# Write back to a table		
+	printOnConsole('Start writing to redshift table : ' + table)
+	
+	groupDf.write.format("com.databricks.spark.redshift").option("url", REDSHIFT_URL).option("dbtable", table).option('tempdir', S3_URL).mode('Append').save()
+	
+	printOnConsole('Finished writing to redshift table : ' + table)
+	
+	
+def processForTable(df, type):
+	
+	print 'processForTable'	
+	df.cache()
+	
+	if PAGEVIEW_TYPE & type:
+		groupDf = df.groupby([COL_STARTTIME, COL_ENDTIME, COL_CUSTOMERID, COL_PROJECTID, COL_FONTTYPE, COL_DOMAINNAME, COL_USERAGENT]).count()
+		writeToTable(REDSHIFT_PAGEVIEW_TBL, groupDf)
+	
+	if PAGEVIEWGEO_TYPE & type:
+		groupDf = df.groupby([COL_STARTTIME, COL_ENDTIME, COL_CUSTOMERID, COL_PROJECTID, COL_FONTTYPE, COL_FONTID, COL_DOMAINNAME, COL_USERAGENT, COL_IPADDRESS]).count()		
+		writeToTable(REDSHIFT_PAGEVIEWGEO_TBL, groupDf)
 		
-		# Write back to a table
 		
-		url = ("jdbc:redshift://" + REDSHIFT_HOSTNAME + ":" + REDSHIFT_PORT + "/" +   REDSHIFT_DATABASE + "?user=" + REDSHIFT_USERNAME + "&password="+ REDSHIFT_PASSWORD)
-		
-		s3Dir = 's3n://' + AWSACCESSID + ':' + AWSSECRETKEY + '@' + BUCKET + '/' + FOLDER
-		
-		print 'Start writing to redshift'
-		df.write.format("com.databricks.spark.redshift").option("url", url).option("dbtable", REDSHIFT_PAGEVIEW_TBL).option('tempdir', s3Dir).mode('Append').save()
-		
-		print 'Finished writing to redshift'
-
 def getSqlContextInstance(sparkContext):
 	if ('sqlContextSingletonInstance' not in globals()):
         	globals()['sqlContextSingletonInstance'] = SQLContext(sparkContext)
     	return globals()['sqlContextSingletonInstance']
 
+def printOnConsole(line):
+	print strftime("%Y-%m-%d %H:%M:%S", gmtime()), '    ', line
+
 def getBrowser(userAgent):
 	# check for empty or null uri
 	if userAgent:
-		browser =  re.search(r'\w+/', userAgent)
-		if browser is not None:
-			return browser.group(0)[:-1].lower()
-		else:
-			return None
+		user_agent =  parse(userAgent)
+		return user_agent.browser.family.lower()
 	else:
 		return None
 
@@ -123,15 +107,17 @@ def setColValues(uri, type):
 				if revfont is not None and revfont.group(2) is not None:
 					font = revfont.group(2)
 					if font:
-						fontSplit = re.split('\.',font)
+						filename, file_extension = os.path.splitext(font)
 						if type in COL_FONTID:
-							if len(fontSplit) > 0:
-								return fontSplit[0]
+							if filename is not None and filename:
+								return filename
 							else:
 								return None
 						elif type in COL_FONTTYPE:
-							if len(fontSplit) > 1:
-								return fontSplit[1]
+							if file_extension is not None and file_extension:
+								fontType = file_extension[1:].lower()
+								if fontType in FONT_LIST:
+									return fontType							 
 							else:
 								return None
 		
@@ -141,7 +127,7 @@ def getDomainName(uri):
 	
 	if uri:
 		params = urlparse(uri)
-		path = params.path
+		path = params.hostname
 		
 		return path
 	else:
@@ -150,10 +136,11 @@ def getDomainName(uri):
 		
 def processRdd(rdd):
 	
+	
+	print 'processRDD'
 	#covnert to a dataframe from rdd
-	sqlContext = SQLContext(rdd.context)
-	registerUDF(sqlContext)
-	print 'Started Processing the streams'
+	
+	printOnConsole('Started Processing the streams')
 
 	desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
 	if rdd.count() > 0:
@@ -162,7 +149,7 @@ def processRdd(rdd):
 	
 		#startTime
 		endTime = getCurrentTimeStamp()
-		startTime = endTime - 10
+		startTime = endTime - SPARK_STREAM_BATCH
 		
 		endTime = getDateTimeFormat(endTime)
 		startTime = getDateTimeFormat(startTime)
@@ -170,7 +157,7 @@ def processRdd(rdd):
 		
 		#endTime
 		df = df.withColumn(COL_ENDTIME, lit(endTime))
-		
+
 		df.registerTempTable("tempTable")
 		query = ('select' + 
 				' startTime,' +  																				#startTime
@@ -183,34 +170,41 @@ def processRdd(rdd):
 				' getBrowser(`c-user-agent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
 				' `c-ip` as ' +  COL_IPADDRESS + 																#customer ipaddress   
 				' from tempTable')
-				
-		
-		print "query to run : ", query
+
 		df = sqlContext.sql(query)
-		print df.head(2)
 		
-		WriteToTable(df, REDSHIFT_PAGEVIEW_TBL)
+		type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
+		processForTable(df, type)
 	else:
-		print 'Nothing to process'
+		printOnConsole('Nothing to process')
+	
+	
 				
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
-	sc = SparkContext("local[*]", "kinesis")
-	ssc = StreamingContext(sc, 10)
+	sc = SparkContext(appName = SPARK_APPNAME)
+	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
 	sc.addPyFile('pyspark_csv.py')
+	sc.addPyFile('constants.py')
+	sqlContext = SQLContext(sc)
+	registerUDF(sqlContext)
 
-	print "Streaming started"	
+	printOnConsole('Streaming started')
 
-	kinesisStream = KinesisUtils.createStream(ssc, APPLICATION_NAME, STREAM_NAME, ENDPOINT, REGION_NAME, INITIAL_POS, CHECKPOINT_INTERVAL, awsAccessKeyId =AWSACCESSID, awsSecretKey=AWSSECRETKEY)    
 	
+	kinesisStream = [KinesisUtils.createStream(ssc, APPLICATION_NAME, STREAM_NAME, ENDPOINT, REGION_NAME, INITIAL_POS, CHECKPOINT_INTERVAL, awsAccessKeyId =AWSACCESSID, awsSecretKey=AWSSECRETKEY, storageLevel=STORAGE_LEVEL) for _ in range (NUM_STREAMS)]
+	
+	unifiedStream = ssc.union(*kinesisStream)
+		
+	print 'Started running'
 	#kinesisStream.reduceByKey(lambda x,y: x+y)
-	kinesisStream.count().pprint()
+	unifiedStream.count().pprint()
 
-	kinesisStream.foreachRDD(processRdd)
+	unifiedStream.foreachRDD(processRdd)
 	
 	ssc.start()
 	ssc.awaitTermination()
-	print "Streaming suspended"
+	printOnConsole('Streaming suspended')
 
 
