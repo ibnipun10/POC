@@ -18,7 +18,6 @@ server.route({
     handler: function (request, reply) {
         
         try {
-            console.log(request.raw.req.headers);
             var headers = request.raw.req.headers;
             
             var uri = headers["x-ec-uri"];

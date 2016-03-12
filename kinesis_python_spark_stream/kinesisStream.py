@@ -12,6 +12,7 @@ from pyspark.sql.types import MapType
 from datetime import datetime
 import calendar
 from pyspark.sql.functions import lit
+from pyspark.sql.types import NullType
 import re
 import os
 from time import gmtime, strftime
