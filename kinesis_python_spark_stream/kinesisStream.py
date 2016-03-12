@@ -146,10 +146,7 @@ def processRdd(rdd):
 	if rdd.count() > 0:
 		df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
 		#df = df.select(desiredCol)
-	
-		print df.head(10)
 		
-	'''
 		#startTime
 		endTime = getCurrentTimeStamp()
 		startTime = endTime - SPARK_STREAM_BATCH
@@ -181,7 +178,7 @@ def processRdd(rdd):
 	else:
 		printOnConsole('Nothing to process')
 	
-	'''
+	
 				
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)

@@ -30,16 +30,16 @@ server.route({
             var httpstatus = headers["x-ec-returnstatus"];
             
             if (useragent != null && useragent != undefined)
-                useragent = useragent.replace(',', '');
+                useragent = '\"' + useragent + '\"';
             
             var params = [uri, projectid, ip, timestamp, useragent, referrer, httpstatus];
             var paramsCsv = utils.convertTocsv(params);
             kinesis.writeToKinesis(paramsCsv)
             
-            reply(request.headers, 200);
+            reply({'reply':'sucess'}, 200);
         }
         catch (ex) {
-            reply(request.headers, 500);
+            reply({'reply':'failiure'}, 500);
         }
          
     }

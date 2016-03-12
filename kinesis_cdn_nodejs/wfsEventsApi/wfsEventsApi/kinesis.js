@@ -38,7 +38,7 @@ module.exports = {
 
             kinesis.putRecords(recordParams, function (err, data) {
                 if (err) console.log(err, err.stack); // an error occurred
-                else console.log(data);           // successful response
+                else console.log("success");           // successful response
             });
         }
         

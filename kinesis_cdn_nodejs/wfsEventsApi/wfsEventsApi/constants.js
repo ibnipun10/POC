@@ -3,7 +3,7 @@ const PORT                      = 3000;
 const KINESIS_STREAM            = 'SAMSAnalytics';
 const KINESIS_REGION            = 'us-east-1';
 const RANDOM_LIMIT              = 100000;
-const RECORDS_BATCH             = 500;
+const RECORDS_BATCH             = 1;
 
 // Cache
 const KEY_RECORDS_COUNT = "COUNT";
