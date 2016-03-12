@@ -1,0 +1,15 @@
+{
+  "name": "wfsEventsApi",
+  "version": "0.0.0",
+  "description": "wfsEventsApi",
+  "main": "app.js",
+  "author": {
+    "name": "agarwaln",
+    "email": ""
+  },
+  "dependencies": {
+    "aws-sdk": "^2.2.43",
+    "hapi": "^13.2.1",
+    "node-cache": "^3.2.0"
+  }
+}

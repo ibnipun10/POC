@@ -1,0 +1,2 @@
+E:\POC\POC\kinesis_cdn_nodejs\wfsEventsApi\wfsEventsApi\obj\Debug\wfsEventsApi.njsprojResolveAssemblyReference.cache
+E:\POC\POC\kinesis_cdn_nodejs\wfsEventsApi\wfsEventsApi\bin\Microsoft.NodejsTools.WebRole.dll
