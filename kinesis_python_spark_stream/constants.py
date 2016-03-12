@@ -4,7 +4,7 @@ from pyspark.storagelevel import StorageLevel
 NUM_STREAMS = 2
 NUM_PARTITIONS = 4
 
-columns = ['LogFilename','RowNumber','timestamp','time-taken','c-ip','filesize','s-ip','s-port','sc-status','sc-bytes','cs-method','cs-uri-stem','-','rs-duration','rs-bytes','c-referrer','c-user-agent','customer-id','x-ec_custom-1']
+columns = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
 
 COL_STARTTIME = 'startTime'
 COL_ENDTIME = 'endTime'

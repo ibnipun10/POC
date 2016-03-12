@@ -142,10 +142,10 @@ def processRdd(rdd):
 	
 	printOnConsole('Started Processing the streams')
 
-	desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
+	#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
 	if rdd.count() > 0:
 		df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
-		df = df.select(desiredCol)
+		#df = df.select(desiredCol)
 	
 		#startTime
 		endTime = getCurrentTimeStamp()
