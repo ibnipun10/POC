@@ -147,6 +147,9 @@ def processRdd(rdd):
 		df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
 		#df = df.select(desiredCol)
 	
+		print df.head(10)
+		
+	'''
 		#startTime
 		endTime = getCurrentTimeStamp()
 		startTime = endTime - SPARK_STREAM_BATCH
@@ -162,13 +165,13 @@ def processRdd(rdd):
 		query = ('select' + 
 				' startTime,' +  																				#startTime
 				' endTime,' +  																					#endTime				
-				' `customer-id` as ' +  COL_CUSTOMERID +  ',' +													#customerid				
-				' setColValues(`cs-uri-stem`, ' +  '\'' + COL_PROJECTID + '\') as ' +  COL_PROJECTID + ',' +	#projectid					 	
-				' setColValues(`cs-uri-stem`, ' +  '\'' + COL_FONTTYPE + '\') as ' +  COL_FONTTYPE +  ',' + 	#FontType
-				' setColValues(`cs-uri-stem`, ' +  '\'' + COL_FONTID + '\') as ' +  COL_FONTID +  ',' + 		#FontId
-				' getDomainName(`x-ec_custom-1`) as ' +  COL_DOMAINNAME +  ',' + 								#DomainName
-				' getBrowser(`c-user-agent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
-				' `c-ip` as ' +  COL_IPADDRESS + 																#customer ipaddress   
+				' null as ' +  COL_CUSTOMERID +  ',' +															#customerid				
+				' projectid as ' +  COL_PROJECTID + ',' +														#projectid					 	
+				' null as ' +  COL_FONTTYPE +  ',' + 															#FontType
+				' null as ' +  COL_FONTID +  ',' + 																#FontId
+				' getDomainName(`uri`) as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
+				' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
+				' ip as ' +  COL_IPADDRESS + 																	#customer ipaddress   
 				' from tempTable')
 
 		df = sqlContext.sql(query)
@@ -178,7 +181,7 @@ def processRdd(rdd):
 	else:
 		printOnConsole('Nothing to process')
 	
-	
+	'''
 				
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
