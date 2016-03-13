@@ -163,10 +163,10 @@ def processRdd(rdd):
 		query = ('select' + 
 				' startTime,' +  																				#startTime
 				' endTime,' +  																					#endTime				
-				' null as ' +  COL_CUSTOMERID +  ',' +															#customerid				
+				' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
 				' projectid as ' +  COL_PROJECTID + ',' +														#projectid					 	
-				' null as ' +  COL_FONTTYPE +  ',' + 															#FontType
-				' null as ' +  COL_FONTID +  ',' + 																#FontId
+				' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
+				' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
 				' getDomainName(`uri`) as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
 				' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
 				' ip as ' +  COL_IPADDRESS + 																	#customer ipaddress   
