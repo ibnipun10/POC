@@ -3,7 +3,11 @@
     utils = require('./utils.js'),
     cache = require('./cacheHelper.js');
 
-var kinesis = new AWS.Kinesis({ region : constants.KINESIS_REGION });
+var kinesis = new AWS.Kinesis({
+    region : constants.KINESIS_REGION, 
+    accessKeyId : constants.KINESIS_ACCESSID,
+    secretAccessKey : constants.KINESIS_SECRET_KEY
+});
 
 module.exports = {
     
