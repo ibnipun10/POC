@@ -21,7 +21,7 @@ COL_PAGEVIEWCOUNT = 'pageViewCount'
 PROJECTID = 'projectId'
 
 #redshift cred
-REDSHIFT_HOSTNAME = 'sams-poc.cfxcbauz3avq.us-east-1.redshift.amazonaws.com:5439'
+REDSHIFT_HOSTNAME = 'sams-poc.cfxcbauz3avq.us-east-1.redshift.amazonaws.com'
 REDSHIFT_PORT = '5439'
 REDSHIFT_USERNAME = 'venkattest'
 REDSHIFT_PASSWORD = 'BPOahslA9ytWRivguhkV'
