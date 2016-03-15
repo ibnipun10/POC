@@ -14,6 +14,21 @@ server.connection({
 
 server.route({
     method: 'GET',
+    path: '/',
+    handler: function (request, reply) {
+        
+        try {          
+            reply({ 'reply': 'sucess' }, 200);
+        }
+        catch (ex) {
+            reply({ 'reply': 'failiure' }, 500);
+        }
+         
+    }
+});
+
+server.route({
+    method: 'GET',
     path: '/post',
     handler: function (request, reply) {
         
