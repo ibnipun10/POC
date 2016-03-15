@@ -46,7 +46,7 @@ S3ACCESSID = 'AKIAJSK34E5YQK36DMRQ'
 S3SECRETKEY = '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'
 BUCKET = 'sams-analytics-poc'
 FOLDER = 'sams-poc'
-S3_URL = 's3n://' + AWSACCESSID + ':' + AWSSECRETKEY + '@' + BUCKET + '/' + FOLDER
+S3_URL = 's3n://' + BUCKET + '/' + FOLDER
 
 FONT_LIST = ['ttf', 'woff', 'woff2', 'svg', 'eot', 'ttf-1', 'woff-3', 'woff2-14', 'svg-11', 'eot-2']
 
