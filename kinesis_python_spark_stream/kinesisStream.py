@@ -22,6 +22,9 @@ from constants import *
 SPARK_APPNAME = 'Kinesis'
 SPARK_STREAM_BATCH = 10
 
+def RemoveNone(df):
+	return df.fillna('')
+
 def writeToTable(table, groupDf):
 
 	print 'writeToTable'
@@ -35,6 +38,10 @@ def writeToTable(table, groupDf):
 	
 	# Write back to a table		
 	printOnConsole('Start writing to redshift table : ' + table)
+	
+	#because of this issue, removing None
+	#https://github.com/databricks/spark-redshift/issues/190
+	groupDf = RemoveNone(groupDf)
 	
 	groupDf.write.format("com.databricks.spark.redshift").option("url", REDSHIFT_URL).option("dbtable", table).option('tempdir', S3_URL).mode('Append').save()
 	
