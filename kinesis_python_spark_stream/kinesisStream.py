@@ -194,10 +194,10 @@ if __name__ == "__main__":
 	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
 	sc.addPyFile('/home/hadoop/POC/kinesis_python_spark_stream/pyspark_csv.py')
-    sc.addPyFile('/home/hadoop/POC/kinesis_python_spark_stream/constants.py')
+        sc.addPyFile('/home/hadoop/POC/kinesis_python_spark_stream/constants.py')
 
-    sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", S3ACCESSID)
-    sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", S3SECRETKEY)
+        sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", S3ACCESSID)
+        sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", S3SECRETKEY)
 
 	sqlContext = SQLContext(sc)
 	registerUDF(sqlContext)
