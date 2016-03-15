@@ -78,13 +78,26 @@ def getBrowser(userAgent):
 	else:
 		return None
 
+def setProjectId(projectid):
+	if projectid:
+		return projectid
+	else:
+		return None
+
+def setIpaddress(ipaddress):
+	if ipaddress:
+		return ipaddress
+	else:
+		return None
+
 def registerUDF(sqlContext):
 	
 	#register all user defined functions
 	sqlContext.registerFunction("getBrowser", getBrowser)
 	sqlContext.registerFunction("setColValues", setColValues)
 	sqlContext.registerFunction("getDomainName", getDomainName)
-	
+	sqlContext.registerFunction("setProjectId", setProjectId)	
+	sqlContext.registerFunction("setIpaddress", setIpaddress)
 
 def getCurrentTimeStamp():
 	d = datetime.utcnow()
@@ -171,12 +184,12 @@ def processRdd(rdd):
 				' startTime,' +  																				#startTime
 				' endTime,' +  																					#endTime				
 				' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
-				' projectid as ' +  COL_PROJECTID + ',' +														#projectid					 	
+				' setProjectId(`projectid`) as ' +  COL_PROJECTID + ',' +														#projectid					 	
 				' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
 				' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
 				' getDomainName(`uri`) as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
 				' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
-				' ip as ' +  COL_IPADDRESS + 																	#customer ipaddress   
+				' setIpaddress(`ip`) as ' +  COL_IPADDRESS + 																	#customer ipaddress   
 				' from tempTable')
 
 		df = sqlContext.sql(query)
@@ -193,8 +206,8 @@ if __name__ == "__main__":
 	sc = SparkContext(appName = SPARK_APPNAME)
 	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
-	sc.addPyFile('/home/hadoop/POC/kinesis_python_spark_stream/pyspark_csv.py')
-        sc.addPyFile('/home/hadoop/POC/kinesis_python_spark_stream/constants.py')
+	sc.addPyFile('CODE_PATH/pyspark_csv.py')
+        sc.addPyFile('CODE_PATH/constants.py')
 
         sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", S3ACCESSID)
         sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", S3SECRETKEY)
