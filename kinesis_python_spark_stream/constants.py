@@ -1,8 +1,10 @@
 from pyspark.streaming.kinesis import InitialPositionInStream
 from pyspark.storagelevel import StorageLevel
 
-NUM_STREAMS = 2
-NUM_PARTITIONS = 4
+NUM_STREAMS = 1
+NUM_EXECUTORS = 2
+NUM_CORES = 2
+NUM_PARTITIONS = 3 * NUM_CORES * NUM_EXECUTORS
 
 columns = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
 
