@@ -206,8 +206,8 @@ if __name__ == "__main__":
 	sc = SparkContext(appName = SPARK_APPNAME)
 	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
-	sc.addPyFile('CODE_PATH/pyspark_csv.py')
-        sc.addPyFile('CODE_PATH/constants.py')
+	sc.addPyFile(CODE_PATH + '/pyspark_csv.py')
+        sc.addPyFile(CODE_PATH + '/constants.py')
 
         sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", S3ACCESSID)
         sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", S3SECRETKEY)
