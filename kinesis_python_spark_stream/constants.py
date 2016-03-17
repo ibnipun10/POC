@@ -6,7 +6,7 @@ NUM_EXECUTORS = 2
 NUM_CORES = 2
 NUM_PARTITIONS = 3 * NUM_CORES * NUM_EXECUTORS
 
-HOME_PATH = '/home/hadoop'
+HOME_PATH = '/home/ubuntu'
 FILE_PATH = '/POC/kinesis_python_spark_stream'
 CODE_PATH = HOME_PATH + FILE_PATH
 

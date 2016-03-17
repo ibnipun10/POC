@@ -201,10 +201,10 @@ def processRdd(rdd):
 		else:
 			printOnConsole('Nothing to process')
 	
-	except:
+	except Exception, ex:
 		printOnConsole('There was an error...')
-                traceback.format_exc()	
-				
+		print ex			
+	
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
 	sc = SparkContext(appName = SPARK_APPNAME)
