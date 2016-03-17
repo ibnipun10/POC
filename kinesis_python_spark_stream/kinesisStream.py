@@ -201,6 +201,7 @@ def processRdd(rdd):
 	
 	except:
 		printOnConsole('There was an error...')
+		print sys.exc_info()[0]
 	
 				
 if __name__ == "__main__":
