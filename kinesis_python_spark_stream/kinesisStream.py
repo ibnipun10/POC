@@ -157,48 +157,50 @@ def getDomainName(uri):
 		
 def processRdd(rdd):
 	
-	
-	print 'processRDD'
-	#covnert to a dataframe from rdd
-	
-	printOnConsole('Started Processing the streams')
+	try:
+		print 'processRDD'
+		#covnert to a dataframe from rdd
+		
+		printOnConsole('Started Processing the streams')
 
-	#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
-	if rdd.count() > 0:
-		df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
-		#df = df.select(desiredCol)
-		
-		#startTime
-		endTime = getCurrentTimeStamp()
-		startTime = endTime - SPARK_STREAM_BATCH
-		
-		endTime = getDateTimeFormat(endTime)
-		startTime = getDateTimeFormat(startTime)
-		df = df.withColumn(COL_STARTTIME, lit(startTime))
-		
-		#endTime
-		df = df.withColumn(COL_ENDTIME, lit(endTime))
+		#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
+		if rdd.count() > 0:
+			df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
+			#df = df.select(desiredCol)
+			
+			#startTime
+			endTime = getCurrentTimeStamp()
+			startTime = endTime - SPARK_STREAM_BATCH
+			
+			endTime = getDateTimeFormat(endTime)
+			startTime = getDateTimeFormat(startTime)
+			df = df.withColumn(COL_STARTTIME, lit(startTime))
+			
+			#endTime
+			df = df.withColumn(COL_ENDTIME, lit(endTime))
 
-		df.registerTempTable("tempTable")
-		query = ('select' + 
-				' startTime,' +  																				#startTime
-				' endTime,' +  																					#endTime				
-				' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
-				' setProjectId(`projectid`) as ' +  COL_PROJECTID + ',' +														#projectid					 	
-				' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
-				' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
-				' getDomainName(`uri`) as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
-				' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
-				' setIpaddress(`ip`) as ' +  COL_IPADDRESS + 																	#customer ipaddress   
-				' from tempTable')
+			df.registerTempTable("tempTable")
+			query = ('select' + 
+					' startTime,' +  																				#startTime
+					' endTime,' +  																					#endTime				
+					' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
+					' setProjectId(`projectid`) as ' +  COL_PROJECTID + ',' +														#projectid					 	
+					' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
+					' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
+					' uri as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
+					' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
+					' setIpaddress(`ip`) as ' +  COL_IPADDRESS + 																	#customer ipaddress   
+					' from tempTable')
 
-		df = sqlContext.sql(query)
-		
-		type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
-		processForTable(df, type)
-	else:
-		printOnConsole('Nothing to process')
+			df = sqlContext.sql(query)
+			
+			type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
+			processForTable(df, type)
+		else:
+			printOnConsole('Nothing to process')
 	
+	except:
+		printOnConsole('There was an error...')
 	
 				
 if __name__ == "__main__":
