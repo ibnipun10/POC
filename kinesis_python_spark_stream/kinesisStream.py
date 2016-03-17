@@ -19,6 +19,7 @@ from time import gmtime, strftime
 from user_agents import parse
 from constants import *
 import sys
+import traceback
 
 SPARK_APPNAME = 'Kinesis'
 SPARK_STREAM_BATCH = 10
@@ -202,8 +203,7 @@ def processRdd(rdd):
 	
 	except:
 		printOnConsole('There was an error...')
-		print sys.exc_info()[0]
-	
+                traceback.format_exc()	
 				
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
