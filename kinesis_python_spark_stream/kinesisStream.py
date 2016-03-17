@@ -18,6 +18,7 @@ import os
 from time import gmtime, strftime
 from user_agents import parse
 from constants import *
+import sys
 
 SPARK_APPNAME = 'Kinesis'
 SPARK_STREAM_BATCH = 10
