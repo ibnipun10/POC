@@ -10,7 +10,8 @@ HOME_PATH = '/home/hadoop'
 FILE_PATH = '/POC/kinesis_python_spark_stream'
 CODE_PATH = HOME_PATH + FILE_PATH
 
-columns = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
+COLUMNS = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
+COLUMN_TYPES = ['string', 'string', 'string', 'string', 'string', 'string', 'string']
 
 COL_STARTTIME = 'startTime'
 COL_ENDTIME = 'endTime'
