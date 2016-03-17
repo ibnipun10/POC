@@ -46,7 +46,7 @@ def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True, colTypes=
     rdd_array = rdd.map(toRow)
     rdd_sql = rdd_array
 
-	'''
+    '''
     if columns is None:
         columns = rdd_array.first()
         rdd_sql = rdd_array.zipWithIndex().filter(
@@ -55,10 +55,10 @@ def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True, colTypes=
 
     def toSqlRow(row):
         return toSqlRowWithType(row, column_types)
-	'''
+    '''
     schema = makeSchema(zip(columns, colTypes))
 	
-    return sqlCtx.createDataFrame(rdd_sql.map(toSqlRow), schema=schema)
+    return sqlCtx.createDataFrame(rdd_sql, schema=schema)
 
 
 def makeSchema(columns):
