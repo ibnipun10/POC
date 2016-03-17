@@ -167,7 +167,7 @@ def processRdd(rdd):
 
 		#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
 		if rdd.count() > 0:
-			df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
+			df = pycsv.csvToDataFrame(sqlContext, rdd, columns=COLUMNS, colTypes=COLUMN_TYPES)
 			#df = df.select(desiredCol)
 			
 			#startTime

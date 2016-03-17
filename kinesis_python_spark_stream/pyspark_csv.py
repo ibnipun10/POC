@@ -31,7 +31,7 @@ from pyspark.sql.types import (StringType, DoubleType, TimestampType, NullType,
 py_version = sys.version_info[0]
 
 
-def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True):
+def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True, colTypes=None):
     """Converts CSV plain text RDD into SparkSQL DataFrame (former SchemaRDD)
     using PySpark. If columns not given, assumes first row is the header.
     If separator not given, assumes comma separated
@@ -46,6 +46,7 @@ def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True):
     rdd_array = rdd.map(toRow)
     rdd_sql = rdd_array
 
+	'''
     if columns is None:
         columns = rdd_array.first()
         rdd_sql = rdd_array.zipWithIndex().filter(
@@ -54,9 +55,9 @@ def csvToDataFrame(sqlCtx, rdd, columns=None, sep=",", parseDate=True):
 
     def toSqlRow(row):
         return toSqlRowWithType(row, column_types)
-
-    schema = makeSchema(zip(columns, column_types))
-
+	'''
+    schema = makeSchema(zip(columns, colTypes))
+	
     return sqlCtx.createDataFrame(rdd_sql.map(toSqlRow), schema=schema)
 
 
