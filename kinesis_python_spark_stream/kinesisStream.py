@@ -189,7 +189,7 @@ def processRdd(rdd):
 					' setProjectId(`projectid`) as ' +  COL_PROJECTID + ',' +														#projectid					 	
 					' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
 					' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
-					' uri as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
+					' referrer as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
 					' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
 					' setIpaddress(`ip`) as ' +  COL_IPADDRESS + 																	#customer ipaddress   
 					' from tempTable')

@@ -37,11 +37,12 @@ server.route({
             
             var uri = headers["x-ec-uri"];
             var projectid = headers["x-ec-projectid"];
-            var ip = headers["x-forwarded-for"];
+            var ip = headers["x-ec-ip"];
             var timestamp = headers["x-ec-timestamp"];
             var useragent = headers["x-ec-user-agent"];
             var referrer = headers["x-ec-referer"];
             var httpstatus = headers["x-ec-returnstatus"];
+
             
             if (useragent != null && useragent != undefined)
                 useragent = useragent.replace(',','');
