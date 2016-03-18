@@ -29,7 +29,7 @@ server.route({
             var httpstatus = headers["x-ec-returnstatus"];
             
             if (useragent != null && useragent != undefined)
-                useragent = '\"' + useragent + '\"';
+                useragent = useragent.replace(',','');
             
             var params = [uri, projectid, ip, timestamp, useragent, referrer, httpstatus];
             var paramsCsv = utils.convertTocsv(params);
