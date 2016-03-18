@@ -18,9 +18,14 @@ import os
 from time import gmtime, strftime
 from user_agents import parse
 from constants import *
+import sys
+import traceback
 
 SPARK_APPNAME = 'Kinesis'
 SPARK_STREAM_BATCH = 10
+
+def RemoveNone(df):
+	return df.fillna('')
 
 def writeToTable(table, groupDf):
 
@@ -35,6 +40,10 @@ def writeToTable(table, groupDf):
 	
 	# Write back to a table		
 	printOnConsole('Start writing to redshift table : ' + table)
+	
+	#because of this issue, removing None
+	#https://github.com/databricks/spark-redshift/issues/190
+	groupDf = RemoveNone(groupDf)
 	
 	groupDf.write.format("com.databricks.spark.redshift").option("url", REDSHIFT_URL).option("dbtable", table).option('tempdir', S3_URL).mode('Append').save()
 	
@@ -71,13 +80,26 @@ def getBrowser(userAgent):
 	else:
 		return None
 
+def setProjectId(projectid):
+	if projectid:
+		return projectid
+	else:
+		return None
+
+def setIpaddress(ipaddress):
+	if ipaddress:
+		return ipaddress
+	else:
+		return None
+
 def registerUDF(sqlContext):
 	
 	#register all user defined functions
 	sqlContext.registerFunction("getBrowser", getBrowser)
 	sqlContext.registerFunction("setColValues", setColValues)
 	sqlContext.registerFunction("getDomainName", getDomainName)
-	
+	sqlContext.registerFunction("setProjectId", setProjectId)	
+	sqlContext.registerFunction("setIpaddress", setIpaddress)
 
 def getCurrentTimeStamp():
 	d = datetime.utcnow()
@@ -137,57 +159,63 @@ def getDomainName(uri):
 		
 def processRdd(rdd):
 	
-	
-	print 'processRDD'
-	#covnert to a dataframe from rdd
-	
-	printOnConsole('Started Processing the streams')
+	try:
+		print 'processRDD'
+		#covnert to a dataframe from rdd
+		
+		printOnConsole('Started Processing the streams')
 
-	#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
-	if rdd.count() > 0:
-		df = pycsv.csvToDataFrame(sqlContext, rdd, columns=columns)
-		#df = df.select(desiredCol)
-		
-		#startTime
-		endTime = getCurrentTimeStamp()
-		startTime = endTime - SPARK_STREAM_BATCH
-		
-		endTime = getDateTimeFormat(endTime)
-		startTime = getDateTimeFormat(startTime)
-		df = df.withColumn(COL_STARTTIME, lit(startTime))
-		
-		#endTime
-		df = df.withColumn(COL_ENDTIME, lit(endTime))
+		#desiredCol = ['c-ip','cs-uri-stem','c-user-agent','customer-id','x-ec_custom-1']
+		if rdd.count() > 0:
+			df = pycsv.csvToDataFrame(sqlContext, rdd, columns=COLUMNS, colTypes=COLUMN_TYPES)
+			#df = df.select(desiredCol)
+			
+			#startTime
+			endTime = getCurrentTimeStamp()
+			startTime = endTime - SPARK_STREAM_BATCH
+			
+			endTime = getDateTimeFormat(endTime)
+			startTime = getDateTimeFormat(startTime)
+			df = df.withColumn(COL_STARTTIME, lit(startTime))
+			
+			#endTime
+			df = df.withColumn(COL_ENDTIME, lit(endTime))
 
-		df.registerTempTable("tempTable")
-		query = ('select' + 
-				' startTime,' +  																				#startTime
-				' endTime,' +  																					#endTime				
-				' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
-				' projectid as ' +  COL_PROJECTID + ',' +														#projectid					 	
-				' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
-				' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
-				' getDomainName(`uri`) as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
-				' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
-				' ip as ' +  COL_IPADDRESS + 																	#customer ipaddress   
-				' from tempTable')
+			df.registerTempTable("tempTable")
+			query = ('select' + 
+					' startTime,' +  																				#startTime
+					' endTime,' +  																					#endTime				
+					' \'\' as ' +  COL_CUSTOMERID +  ',' +															#customerid				
+					' setProjectId(`projectid`) as ' +  COL_PROJECTID + ',' +														#projectid					 	
+					' \'\' as ' +  COL_FONTTYPE +  ',' + 															#FontType
+					' \'\' as ' +  COL_FONTID +  ',' + 																#FontId
+					' uri as ' +  COL_DOMAINNAME +  ',' + 											#DomainName
+					' getBrowser(`useragent`) as ' + COL_USERAGENT +  ',' + 										#UserAgent
+					' setIpaddress(`ip`) as ' +  COL_IPADDRESS + 																	#customer ipaddress   
+					' from tempTable')
 
-		df = sqlContext.sql(query)
-		
-		type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
-		processForTable(df, type)
-	else:
-		printOnConsole('Nothing to process')
+			df = sqlContext.sql(query)
+			
+			type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
+			processForTable(df, type)
+		else:
+			printOnConsole('Nothing to process')
 	
+	except Exception, ex:
+		printOnConsole('There was an error...')
+		print ex			
 	
-				
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
 	sc = SparkContext(appName = SPARK_APPNAME)
 	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
-	sc.addPyFile('pyspark_csv.py')
-	sc.addPyFile('constants.py')
+	sc.addPyFile(CODE_PATH + '/pyspark_csv.py')
+        sc.addPyFile(CODE_PATH + '/constants.py')
+
+        sc._jsc.hadoopConfiguration().set("fs.s3n.awsAccessKeyId", S3ACCESSID)
+        sc._jsc.hadoopConfiguration().set("fs.s3n.awsSecretAccessKey", S3SECRETKEY)
+
 	sqlContext = SQLContext(sc)
 	registerUDF(sqlContext)
 

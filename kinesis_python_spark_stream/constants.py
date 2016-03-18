@@ -1,10 +1,17 @@
 from pyspark.streaming.kinesis import InitialPositionInStream
 from pyspark.storagelevel import StorageLevel
 
-NUM_STREAMS = 2
-NUM_PARTITIONS = 4
+NUM_STREAMS = 1
+NUM_EXECUTORS = 2
+NUM_CORES = 2
+NUM_PARTITIONS = 3 * NUM_CORES * NUM_EXECUTORS
 
-columns = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
+HOME_PATH = '/home/ubuntu'
+FILE_PATH = '/POC/kinesis_python_spark_stream'
+CODE_PATH = HOME_PATH + FILE_PATH
+
+COLUMNS = ['uri', 'projectid', 'ip', 'timestamp', 'useragent', 'referrer', 'httpstatus']
+COLUMN_TYPES = ['string', 'string', 'string', 'string', 'string', 'string', 'string']
 
 COL_STARTTIME = 'startTime'
 COL_ENDTIME = 'endTime'
@@ -21,7 +28,7 @@ COL_PAGEVIEWCOUNT = 'pageViewCount'
 PROJECTID = 'projectId'
 
 #redshift cred
-REDSHIFT_HOSTNAME = 'venkat-test.cfxcbauz3avq.us-east-1.redshift.amazonaws.com'
+REDSHIFT_HOSTNAME = 'sams-poc.cfxcbauz3avq.us-east-1.redshift.amazonaws.com'
 REDSHIFT_PORT = '5439'
 REDSHIFT_USERNAME = 'venkattest'
 REDSHIFT_PASSWORD = 'BPOahslA9ytWRivguhkV'
@@ -46,7 +53,7 @@ S3ACCESSID = 'AKIAJSK34E5YQK36DMRQ'
 S3SECRETKEY = '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'
 BUCKET = 'sams-analytics-poc'
 FOLDER = 'sams-poc'
-S3_URL = 's3n://' + AWSACCESSID + ':' + AWSSECRETKEY + '@' + BUCKET + '/' + FOLDER
+S3_URL = 's3n://' + BUCKET + '/' + FOLDER
 
 FONT_LIST = ['ttf', 'woff', 'woff2', 'svg', 'eot', 'ttf-1', 'woff-3', 'woff2-14', 'svg-11', 'eot-2']
 
