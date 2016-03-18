@@ -35,13 +35,14 @@ server.route({
         try {
             var headers = request.raw.req.headers;
             
-            var uri = headers["x-ec-uri"];
-            var projectid = headers["x-ec-projectid"];
-            var ip = headers["x-forwarded-for"];
-            var timestamp = headers["x-ec-timestamp"];
-            var useragent = headers["x-ec-user-agent"];
-            var referrer = headers["x-ec-referer"];
-            var httpstatus = headers["x-ec-returnstatus"];
+            var uri = headers["X-EC-Uri"];
+            var projectid = headers["X-EC-projectid"];
+            var ip = headers["X-EC-IP"];
+            var timestamp = headers["X-EC-Timestamp"];
+            var useragent = headers["X-EC-User-Agent"];
+            var referrer = headers["X-EC-Referer"];
+            var httpstatus = headers["X-EC-ReturnStatus"];
+
             
             if (useragent != null && useragent != undefined)
                 useragent = useragent.replace(',','');
