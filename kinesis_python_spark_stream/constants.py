@@ -6,7 +6,7 @@ NUM_EXECUTORS = 2
 NUM_CORES = 2
 NUM_PARTITIONS = 3 * NUM_CORES * NUM_EXECUTORS
 
-HOME_PATH = '/home/ubuntu'
+HOME_PATH = '/home/hadoop'
 FILE_PATH = '/POC/kinesis_python_spark_stream'
 CODE_PATH = HOME_PATH + FILE_PATH
 
@@ -23,7 +23,7 @@ COL_DOMAINNAME = 'domainName'
 COL_USERAGENT = 'userAgent'
 COL_IPADDRESS = 'ipAddress'
 COL_GEOLOCATION = 'geoLocation'
-COL_PAGEVIEWCOUNT = 'pageViewCount'
+COL_PAGEVIEWCOUNT = 'webfontusage'
 
 PROJECTID = 'projectId'
 
@@ -32,7 +32,7 @@ REDSHIFT_HOSTNAME = 'sams-poc.cfxcbauz3avq.us-east-1.redshift.amazonaws.com'
 REDSHIFT_PORT = '5439'
 REDSHIFT_USERNAME = 'venkattest'
 REDSHIFT_PASSWORD = 'BPOahslA9ytWRivguhkV'
-REDSHIFT_DATABASE = 'venkattest'
+REDSHIFT_DATABASE = 'webtracking'
 REDSHIFT_PAGEVIEW_TBL = 'PageView'
 REDSHIFT_PAGEVIEWGEO_TBL = 'PageViewGeo'
 REDSHIFT_URL = ("jdbc:redshift://" + REDSHIFT_HOSTNAME + ":" + REDSHIFT_PORT + "/" +   REDSHIFT_DATABASE + "?user=" + REDSHIFT_USERNAME + "&password="+ REDSHIFT_PASSWORD)
