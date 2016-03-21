@@ -53,7 +53,7 @@ def writeToTable(table, groupDf):
 def processForTable(df, type):
 	
 	print 'processForTable'	
-	#df.cache()
+	df.cache()
 	
 	if PAGEVIEW_TYPE & type:
 		groupDf = df.groupby([COL_STARTTIME, COL_ENDTIME, COL_CUSTOMERID, COL_PROJECTID, COL_FONTTYPE, COL_DOMAINNAME, COL_USERAGENT]).count()
@@ -62,7 +62,8 @@ def processForTable(df, type):
 	if PAGEVIEWGEO_TYPE & type:
 		groupDf = df.groupby([COL_STARTTIME, COL_ENDTIME, COL_CUSTOMERID, COL_PROJECTID, COL_FONTTYPE, COL_FONTID, COL_DOMAINNAME, COL_USERAGENT, COL_IPADDRESS]).count()		
 		writeToTable(REDSHIFT_PAGEVIEWGEO_TBL, groupDf)
-		
+	
+        df.unpersist(False)	
 		
 def getSqlContextInstance(sparkContext):
 	if ('sqlContextSingletonInstance' not in globals()):
