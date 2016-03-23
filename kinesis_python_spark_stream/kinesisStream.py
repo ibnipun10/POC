@@ -34,16 +34,16 @@ def writeToTable(table, groupDf):
 	groupDf = groupDf.withColumnRenamed('count', COL_PAGEVIEWCOUNT)
 	
 	groupDf = groupDf.coalesce(NUM_PARTITIONS)
-	count = groupDf.count()	
+	#count = groupDf.count()	
 	
-	printOnConsole(' count of groupdf ' + table + ' is : ' + str(count))
+	#printOnConsole(' count of groupdf ' + table + ' is : ' + str(count))
 	
 	# Write back to a table		
 	printOnConsole('Start writing to redshift table : ' + table)
 	
 	#because of this issue, removing None
 	#https://github.com/databricks/spark-redshift/issues/190
-	groupDf = RemoveNone(groupDf)
+	#groupDf = RemoveNone(groupDf)
 	
 	groupDf.write.format("com.databricks.spark.redshift").option("url", REDSHIFT_URL).option("dbtable", table).option('tempdir', S3_URL).mode('Append').save()
 	
@@ -228,8 +228,8 @@ if __name__ == "__main__":
 	unifiedStream = ssc.union(*kinesisStream)
 		
 	print 'Started running'
-	#kinesisStream.reduceByKey(lambda x,y: x+y)
-	unifiedStream.count().pprint()
+	#unikinesisStream.reduceByKey(lambda x,y: x+y)
+	#unifiedStream.count().pprint()
 
 	unifiedStream.foreachRDD(processRdd)
 	
