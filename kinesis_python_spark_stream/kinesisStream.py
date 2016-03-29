@@ -1,5 +1,6 @@
 from pyspark.streaming.kinesis import KinesisUtils
 from pyspark import SparkContext
+from pyspark import SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.sql import SQLContext
 import pyspark_csv as pycsv
@@ -22,7 +23,8 @@ import sys
 import traceback
 
 SPARK_APPNAME = 'Kinesis'
-SPARK_STREAM_BATCH = 10
+SPARK_STREAM_BATCH = 20
+SPARK_SERIALIZER = "org.apache.spark.serializer.KryoSerializer"
 
 def RemoveNone(df):
 	return df.fillna('')
@@ -33,10 +35,10 @@ def writeToTable(table, groupDf):
 	
 	groupDf = groupDf.withColumnRenamed('count', COL_PAGEVIEWCOUNT)
 	
-	groupDf = groupDf.coalesce(NUM_PARTITIONS)
-	#count = groupDf.count()	
+	#groupDf = groupDf.coalesce(NUM_PARTITIONS)
+	count = groupDf.count()	
 	
-	#printOnConsole(' count of groupdf ' + table + ' is : ' + str(count))
+	printOnConsole(' count of groupdf ' + table + ' is : ' + str(count))
 	
 	# Write back to a table		
 	printOnConsole('Start writing to redshift table : ' + table)
@@ -44,7 +46,8 @@ def writeToTable(table, groupDf):
 	#because of this issue, removing None
 	#https://github.com/databricks/spark-redshift/issues/190
 	#groupDf = RemoveNone(groupDf)
-	
+
+        groupDf = groupDf.coalesce(NUM_TRUE_CORES)	
 	groupDf.write.format("com.databricks.spark.redshift").option("url", REDSHIFT_URL).option("dbtable", table).option('tempdir', S3_URL).mode('Append').save()
 	
 	printOnConsole('Finished writing to redshift table : ' + table)
@@ -208,7 +211,11 @@ def processRdd(rdd):
 	
 if __name__ == "__main__":
 	#_conf = new SparkConf(true)
-	sc = SparkContext(appName = SPARK_APPNAME)
+    	conf = (SparkConf()
+         .setAppName(SPARK_APPNAME)
+         .set("spark.serializer", SPARK_SERIALIZER))
+
+        sc = SparkContext(conf=conf)
 	ssc = StreamingContext(sc, SPARK_STREAM_BATCH)
 
 	sc.addPyFile(CODE_PATH + '/pyspark_csv.py')

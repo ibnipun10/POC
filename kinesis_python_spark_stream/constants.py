@@ -1,10 +1,11 @@
 from pyspark.streaming.kinesis import InitialPositionInStream
 from pyspark.storagelevel import StorageLevel
 
-NUM_STREAMS = 2
-NUM_EXECUTORS = 2
-NUM_CORES = 2
-NUM_PARTITIONS = 3 * NUM_CORES * NUM_EXECUTORS
+NUM_STREAMS = 4
+NUM_EXECUTORS = 4
+NUM_CORES = 4
+NUM_PARTITIONS = 1 * NUM_CORES * NUM_EXECUTORS
+NUM_TRUE_CORES = 7     #change this value according to executors cores
 
 HOME_PATH = '/home/hadoop'
 FILE_PATH = '/POC/kinesis_python_spark_stream'
