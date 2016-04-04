@@ -17,9 +17,9 @@ def lambda_handler(event, context):
         # Kinesis data is base64 encoded so decode here
         payload = base64.b64decode(record['kinesis']['data'])
         data = payload + '\n'
-        p = {'Data': data }
-        Records.append(p)
-    
+        
+    p = {'Data': data }
+    Records.append(p)
     print('writing to firehose')
     response = client.put_record_batch(DeliveryStreamName=DeliveryStreamName, Records=Records)
     print("Wrote the following records to Firehose: " + str(len(Records)))
