@@ -200,7 +200,7 @@ def processRdd(rdd):
 
 			df = sqlContext.sql(query)
 			
-			type =  PAGEVIEW_TYPE | PAGEVIEWGEO_TYPE
+			type =  PAGEVIEW_TYPE
 			processForTable(df, type)
 		else:
 			printOnConsole('Nothing to process')
